@@ -4,6 +4,7 @@ import com.pec.studentportal.Entity.RegisteredUser;
 import com.pec.studentportal.Entity.Student;
 import com.pec.studentportal.Services.TestingService;
 import com.pec.studentportal.dto.RegistrationDTO;
+import com.pec.studentportal.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +16,28 @@ public class TestingController {
     private TestingService testingService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/saveStudent")
-    public void saveStudent(@RequestBody Student student) {
+    public void saveStudent(@RequestBody StudentPojo student) {
         testingService.saveStudent(student);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/saveSubject")
+    public void saveSubject(@RequestBody SubjectPojo subjectPojo) {
+        testingService.saveSubject(subjectPojo);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/registerStudentForCourse")
+    public void registerStudentForCourse(@RequestBody StudentSubjectRegistrationPojo studentSubjectRegistrationPojo) {
+        testingService.registerStudentForCourse(studentSubjectRegistrationPojo);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/addMarks")
+    public void addMarks(@RequestBody MarksDistributionPojo marksDistributionPojo) {
+        testingService.addMarks(marksDistributionPojo);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/saveDepartment")
+    public void saveDepartment(@RequestBody DepartmentPojo department) {
+        testingService.saveDepartment(department);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/getStudentById/{id}")
