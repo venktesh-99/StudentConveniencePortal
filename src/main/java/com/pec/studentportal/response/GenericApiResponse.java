@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GenericApiResponse {
 
-    private boolean successful;
+    protected boolean successful;
 
-    private String message;
+    protected String message;
 
 }

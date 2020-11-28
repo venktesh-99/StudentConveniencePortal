@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MarksDetail {
+public class AttendancePojo {
 
-    private Double marksObtained;
+    private Integer studentId;
 
-    private Double maximumMarks;
+    private String courseCode;
 
-    private String description;
+    private Integer attendanceCount;
+
+    private String attendanceStatus;
+
 }

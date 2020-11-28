@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class TestingService {
 
     @Autowired
     private MarksDistributionRepository marksDistributionRepository;
+
+    @Autowired
+    private AttendanceRecordRepository attendanceRecordRepository;
 
     public void saveDepartment(DepartmentPojo departmentPojo) {
         List<Student> students = new ArrayList<>();
@@ -148,6 +152,18 @@ public class TestingService {
                 .studentSubjectRegistration(studentSubjectRegistration)
                 .build();
         marksDistributionRepository.save(marksDistribution);
+    }
+
+    public void addAttendance(AttendancePojo attendancePojo) {
+        Student student = studentRepository.findByStudentId(attendancePojo.getStudentId());
+        StudentSubjectRegistration studentSubjectRegistration = student.getSubjectRegistrations().stream().filter(studentSubjectRegistration1 -> studentSubjectRegistration1.getSubject().getCourseCode().equals(attendancePojo.getCourseCode())).collect(Collectors.toList()).get(0);
+        AttendanceRecord attendanceRecord = AttendanceRecord.builder()
+                .attendanceCount(attendancePojo.getAttendanceCount())
+                .attendanceStatus(AttendanceStatus.valueOf(attendancePojo.getAttendanceStatus()))
+                .date(LocalDate.now())
+                .studentSubjectRegistration(studentSubjectRegistration)
+                .build();
+        attendanceRecordRepository.save(attendanceRecord);
     }
 
     public Student getStudentById(Integer id) {

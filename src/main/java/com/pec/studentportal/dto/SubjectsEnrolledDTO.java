@@ -1,4 +1,4 @@
-package com.pec.studentportal.pojo;
+package com.pec.studentportal.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MarksDetail {
+public class SubjectsEnrolledDTO {
 
-    private Double marksObtained;
+    String courseCode;
 
-    private Double maximumMarks;
+    String courseName;
 
-    private String description;
 }

@@ -5,8 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class GenericApiDataResponse<T> extends GenericApiResponse {
-    T data;
+    private T data;
+
+    public GenericApiDataResponse(boolean successful, String message, T data) {
+        this.successful = successful;
+        this.message = message;
+        this.data = data;
+    }
 }

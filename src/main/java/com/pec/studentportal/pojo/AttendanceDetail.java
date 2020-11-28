@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MarksDetail {
+public class AttendanceDetail {
 
-    private Double marksObtained;
+    private LocalDate date;
 
-    private Double maximumMarks;
+    private Integer attendanceCount;
 
-    private String description;
+    private String attendanceStatus;
 }

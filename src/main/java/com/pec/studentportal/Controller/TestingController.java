@@ -35,6 +35,11 @@ public class TestingController {
         testingService.addMarks(marksDistributionPojo);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/addAttendance")
+    public void addAttendance(@RequestBody AttendancePojo attendancePojo) {
+        testingService.addAttendance(attendancePojo);
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/saveDepartment")
     public void saveDepartment(@RequestBody DepartmentPojo department) {
         testingService.saveDepartment(department);
