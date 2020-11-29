@@ -40,6 +40,12 @@ public class TestingService {
     @Autowired
     private AttendanceRecordRepository attendanceRecordRepository;
 
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private BookIssueRecordRepository bookIssueRecordRepository;
+
     public void saveDepartment(DepartmentPojo departmentPojo) {
         List<Student> students = new ArrayList<>();
         List<Teacher> teachers = new ArrayList<>();
@@ -129,6 +135,29 @@ public class TestingService {
                 .courseName(subjectPojo.getCourseName())
                 .build();
         subjectRepository.save(subject);
+    }
+
+    public void saveBook(BookPojo bookPojo) {
+        Book book = Book.builder()
+                .bookId(bookPojo.getBookId())
+                .author(bookPojo.getAuthor())
+                .title(bookPojo.getTitle())
+                .edition(bookPojo.getEdition())
+                .description(bookPojo.getDescription())
+                .build();
+        bookRepository.save(book);
+    }
+
+    public void issueBook(BookIssueRecordPojo bookIssueRecordPojo) {
+        Book book = bookRepository.findByBookId(bookIssueRecordPojo.getBookId());
+        BookIssueRecord bookIssueRecord = BookIssueRecord.builder()
+                .book(book)
+                .issueDate(LocalDate.of(2020,10,1))
+                .dueDate(LocalDate.of(2020,12,3))
+                .studentId(bookIssueRecordPojo.getStudentId())
+                .bookReturnStatus(BookReturnStatus.valueOf(bookIssueRecordPojo.getBookReturnStatus()))
+                .build();
+        bookIssueRecordRepository.save(bookIssueRecord);
     }
 
     public void registerStudentForCourse(StudentSubjectRegistrationPojo studentSubjectRegistrationPojo) {

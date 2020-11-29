@@ -45,6 +45,16 @@ public class TestingController {
         testingService.saveDepartment(department);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/saveBook")
+    public void saveBook(@RequestBody BookPojo bookPojo) {
+        testingService.saveBook(bookPojo);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/issueBook")
+    public void issueBook(@RequestBody BookIssueRecordPojo bookIssueRecordPojo) {
+        testingService.issueBook(bookIssueRecordPojo);
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/getStudentById/{id}")
     public Student getStudentById(@PathVariable String id) {
         return testingService.getStudentById(Integer.parseInt(id));
