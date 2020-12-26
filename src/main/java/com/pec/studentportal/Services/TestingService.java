@@ -153,7 +153,7 @@ public class TestingService {
         BookIssueRecord bookIssueRecord = BookIssueRecord.builder()
                 .book(book)
                 .issueDate(LocalDate.of(2020,10,1))
-                .dueDate(LocalDate.of(2020,12,3))
+                .dueDate(LocalDate.of(2020,10,3))
                 .studentId(bookIssueRecordPojo.getStudentId())
                 .bookReturnStatus(BookReturnStatus.valueOf(bookIssueRecordPojo.getBookReturnStatus()))
                 .build();
