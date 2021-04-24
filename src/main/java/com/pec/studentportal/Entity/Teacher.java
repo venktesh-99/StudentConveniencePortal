@@ -7,10 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -21,6 +19,9 @@ public class Teacher extends AbstractEntity<Integer> {
 
     @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
+    private Integer teacherId;
 
     private String firstName;
 
@@ -36,4 +37,8 @@ public class Teacher extends AbstractEntity<Integer> {
     @JsonIgnore
     @JoinColumn(name="department_id")
     private Department department;
+
+    @OneToMany(mappedBy = "teacher")
+    private List<TeacherSubjectRegisteration> subjectRegisterations;
+
 }

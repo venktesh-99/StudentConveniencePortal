@@ -34,6 +34,8 @@ public class StudentSubjectRegistration extends AbstractEntity<Integer> {
 
     private Integer totalLecturesAttended;
 
+    private Integer semester;
+
     @OneToMany(targetEntity = AttendanceRecord.class, mappedBy = "studentSubjectRegistration", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AttendanceRecord> attendanceRecords;
 

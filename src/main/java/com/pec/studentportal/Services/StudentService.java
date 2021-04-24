@@ -17,6 +17,8 @@ public interface StudentService {
 
     GenericApiDataResponse<MarksDetailDTO> fetchMarksForASubject(Integer studentId, String courseCode);
 
+
+
     GenericApiDataResponse<AttendanceRecordDTO> fetchAttendanceForASubject(Integer studentId, String courseCode);
 
     GenericApiDataResponse<Map<String, Map<EvaluationType, List<MarksDistribution>>>> fetchMarks(Integer studentId);
