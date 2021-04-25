@@ -16,8 +16,7 @@ public class TeacherController {
     private TeacherService teacherService;
 
     @RequestMapping(method = RequestMethod.GET, value="/fetchSubjectForATeacher/{id}")
-    public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(@PathVariable String id)
-    {
+    public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(@PathVariable String id) {
         return teacherService.fetchSubjectForATeacher(Integer.parseInt(id));
     }
 }
