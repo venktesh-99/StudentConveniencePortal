@@ -1,5 +1,6 @@
 package com.pec.studentportal.Services.impl;
 
+import com.pec.studentportal.Entity.Subject;
 import com.pec.studentportal.Entity.Teacher;
 import com.pec.studentportal.Entity.TeacherSubjectRegistration;
 import com.pec.studentportal.Repository.TeacherRepository;
@@ -27,12 +28,12 @@ public class TeacherServiceImpl implements TeacherService {
             List<TeacherSubjectRegistration> teacherSubjectRegistrations = teacher.getSubjectRegistrations();
             List<SubjectsEnrolledDTO> subjectsEnrolledDTOS = new ArrayList<>();
             teacherSubjectRegistrations.forEach(teacherSubjectRegistration -> {
-                SubjectsEnrolledDTO subjectsEnrolledDTO = SubjectsEnrolledDTO.builder().courseCode(teacherSubjectRegistration.getSubject().getCourseCode()).courseName(teacherSubjectRegistration.getSubject().getCourseName()).build();
+                Subject subject = teacherSubjectRegistration.getSubject();
+                SubjectsEnrolledDTO subjectsEnrolledDTO = SubjectsEnrolledDTO.builder().courseId(subject.getId()).courseCode(subject.getCourseCode()).courseName(subject.getCourseName()).build();
                 subjectsEnrolledDTOS.add(subjectsEnrolledDTO);
             });
             return new GenericApiDataResponse<>(true, "Success", subjectsEnrolledDTOS);
         } catch (Exception e) {
-
             log.error("fetch_subject_enrollments_error:teacherId:{} with error:{}", teacherId, e);
             return new GenericApiDataResponse<>(false, "Some error occurred.", null);
         }

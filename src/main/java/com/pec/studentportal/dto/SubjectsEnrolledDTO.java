@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SubjectsEnrolledDTO {
 
-    String courseCode;
+    private Integer courseId;
 
-    String courseName;
+    private String courseCode;
+
+    private String courseName;
 
 }
