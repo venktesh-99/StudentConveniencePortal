@@ -1,7 +1,7 @@
 package com.pec.studentportal.Services.impl;
 
 import com.pec.studentportal.Entity.Teacher;
-import com.pec.studentportal.Entity.TeacherSubjectRegisteration;
+import com.pec.studentportal.Entity.TeacherSubjectRegistration;
 import com.pec.studentportal.Repository.TeacherRepository;
 import com.pec.studentportal.Services.TeacherService;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
@@ -21,21 +21,20 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private TeacherRepository teacherRepository;
 
-    public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(Integer teacherId)
-    {
+    public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(Integer teacherId) {
         try {
             Teacher teacher = teacherRepository.findByTeacherId(teacherId);
-            List<TeacherSubjectRegisteration> teacherSubjectRegisterations = teacher.getSubjectRegisterations();
+            List<TeacherSubjectRegistration> teacherSubjectRegistrations = teacher.getSubjectRegistrations();
             List<SubjectsEnrolledDTO> subjectsEnrolledDTOS = new ArrayList<>();
-            teacherSubjectRegisterations.forEach(teacherSubjectRegisteration -> {
-                SubjectsEnrolledDTO subjectsEnrolledDTO = SubjectsEnrolledDTO.builder().courseCode(teacherSubjectRegisteration.getSubject().getCourseCode()).courseName(teacherSubjectRegisteration.getSubject().getCourseName()).build();
+            teacherSubjectRegistrations.forEach(teacherSubjectRegistration -> {
+                SubjectsEnrolledDTO subjectsEnrolledDTO = SubjectsEnrolledDTO.builder().courseCode(teacherSubjectRegistration.getSubject().getCourseCode()).courseName(teacherSubjectRegistration.getSubject().getCourseName()).build();
                 subjectsEnrolledDTOS.add(subjectsEnrolledDTO);
             });
             return new GenericApiDataResponse<>(true, "Success", subjectsEnrolledDTOS);
         } catch (Exception e) {
 
-            log.error("fetch_subject_enrollments_error:teacherId:{} with error:{}",teacherId,e);
-            return new GenericApiDataResponse<>(false,"Some error occurred.",null);
+            log.error("fetch_subject_enrollments_error:teacherId:{} with error:{}", teacherId, e);
+            return new GenericApiDataResponse<>(false, "Some error occurred.", null);
         }
     }
 }

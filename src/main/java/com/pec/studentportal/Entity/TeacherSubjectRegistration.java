@@ -16,7 +16,8 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherSubjectRegisteration extends AbstractEntity<Integer>{
+public class TeacherSubjectRegistration extends AbstractEntity<Integer>{
+
     @ManyToMany
     @JsonIgnore
     @JoinColumn(name="teacher_id")
