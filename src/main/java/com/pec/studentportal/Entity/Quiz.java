@@ -8,15 +8,25 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherSubjectRegistration extends AbstractEntity<Integer>{
+public class Quiz extends AbstractEntity<Integer> {
+
+    private String quizDate;
+
+    private String quizTimings;
+
+    private String syllabus;
+
+    private String quizInstructions;
 
     @ManyToOne
     @JsonIgnore
@@ -25,6 +35,10 @@ public class TeacherSubjectRegistration extends AbstractEntity<Integer>{
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "subject_id")
+    @JoinColumn(name="subject_id")
     private Subject subject;
+
+    @OneToMany(mappedBy = "quiz")
+    private List<QuizPostings> quizPostings;
+
 }

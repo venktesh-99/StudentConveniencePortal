@@ -41,4 +41,7 @@ public class Teacher extends AbstractEntity<Integer> {
     @OneToMany(mappedBy = "teacher")
     private List<TeacherSubjectRegistration> subjectRegistrations;
 
+    @OneToMany(mappedBy = "teacher")
+    private List<Quiz> postedQuizzes;
+
 }

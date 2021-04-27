@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -16,15 +15,16 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherSubjectRegistration extends AbstractEntity<Integer>{
+public class QuizPostings extends AbstractEntity<Integer> {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="teacher_id")
-    private Teacher teacher;
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
+    @JoinColumn(name = "student_id")
+    private Student student;
+
 }

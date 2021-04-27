@@ -20,14 +20,24 @@ public class TestingController {
         testingService.saveStudent(student);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/saveTeacher")
+    public void saveTeacher(@RequestBody TeacherPojo teacher) {
+        testingService.saveTeacher(teacher);
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/saveSubject")
     public void saveSubject(@RequestBody SubjectPojo subjectPojo) {
         testingService.saveSubject(subjectPojo);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/registerStudentForCourse")
-    public void registerStudentForCourse(@RequestBody StudentSubjectRegistrationPojo studentSubjectRegistrationPojo) {
-        testingService.registerStudentForCourse(studentSubjectRegistrationPojo);
+    public void registerStudentForCourse(@RequestBody SubjectRegistrationPojo subjectRegistrationPojo) {
+        testingService.registerStudentForCourse(subjectRegistrationPojo);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/registerTeacherForCourse")
+    public void registerTeacherForCourse(@RequestBody SubjectRegistrationPojo subjectRegistrationPojo) {
+        testingService.registerTeacherForCourse(subjectRegistrationPojo);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/addMarks")

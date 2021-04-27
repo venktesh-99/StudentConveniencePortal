@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentSubjectRegistrationPojo {
+public class SubjectRegistrationPojo {
 
-    private Integer studentId;
+    private Integer id;
 
     private String courseCode;
 

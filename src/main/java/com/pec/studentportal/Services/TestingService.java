@@ -23,6 +23,12 @@ public class TestingService {
     private StudentRepository studentRepository;
 
     @Autowired
+    private TeacherRepository teacherRepository;
+
+    @Autowired
+    private TeacherSubjectRegistrationRepository teacherSubjectRegistrationRepository;
+
+    @Autowired
     private RegisteredUserRepository registeredUserRepository;
 
     @Autowired
@@ -128,6 +134,31 @@ public class TestingService {
         student.setStudentRelatives(studentRelatives);
         studentRepository.save(student);
     }
+    private String email;
+
+    private Integer teacherId;
+
+    private String firstName;
+
+    private String middleName;
+
+    private String lastName;
+
+    private String contactNumbers;
+
+    private Gender gender;
+    public void saveTeacher(TeacherPojo teacherPojo) {
+        Teacher teacher = Teacher.builder()
+                .email(teacherPojo.getEmail())
+                .teacherId(teacherPojo.getTeacherId())
+                .firstName(teacherPojo.getFirstName())
+                .middleName(teacherPojo.getMiddleName())
+                .lastName(teacherPojo.getLastName())
+                .contactNumbers(teacherPojo.getContactNumbers())
+                .gender(teacherPojo.getGender())
+                .build();
+        teacherRepository.save(teacher);
+    }
 
     public void saveSubject(SubjectPojo subjectPojo) {
         Subject subject = Subject.builder()
@@ -160,14 +191,24 @@ public class TestingService {
         bookIssueRecordRepository.save(bookIssueRecord);
     }
 
-    public void registerStudentForCourse(StudentSubjectRegistrationPojo studentSubjectRegistrationPojo) {
-        Student student = studentRepository.findByStudentId(studentSubjectRegistrationPojo.getStudentId());
-        Subject subject = subjectRepository.findByCourseCode(studentSubjectRegistrationPojo.getCourseCode());
+    public void registerStudentForCourse(SubjectRegistrationPojo subjectRegistrationPojo) {
+        Student student = studentRepository.findByStudentId(subjectRegistrationPojo.getId());
+        Subject subject = subjectRepository.findByCourseCode(subjectRegistrationPojo.getCourseCode());
         StudentSubjectRegistration studentSubjectRegistration = StudentSubjectRegistration.builder()
                 .student(student)
                 .subject(subject)
                 .build();
         studentSubjectRegistrationRepository.save(studentSubjectRegistration);
+    }
+
+    public void registerTeacherForCourse(SubjectRegistrationPojo subjectRegistrationPojo) {
+        Teacher teacher = teacherRepository.findByTeacherId(subjectRegistrationPojo.getId());
+        Subject subject = subjectRepository.findByCourseCode(subjectRegistrationPojo.getCourseCode());
+        TeacherSubjectRegistration teacherSubjectRegistration = TeacherSubjectRegistration.builder()
+                .teacher(teacher)
+                .subject(subject)
+                .build();
+        teacherSubjectRegistrationRepository.save(teacherSubjectRegistration);
     }
 
     public void addMarks(MarksDistributionPojo marksDistributionPojo) {
