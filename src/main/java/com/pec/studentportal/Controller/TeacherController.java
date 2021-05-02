@@ -1,6 +1,7 @@
 package com.pec.studentportal.Controller;
 
 import com.pec.studentportal.Services.TeacherService;
+import com.pec.studentportal.dto.AssignmentDto;
 import com.pec.studentportal.dto.QuizDTO;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
 import com.pec.studentportal.response.GenericApiDataResponse;
@@ -26,4 +27,10 @@ public class TeacherController {
     public GenericApiResponse postAQuiz(@RequestParam Integer teacherId, @RequestParam String courseCode, @RequestBody QuizDTO quizDetails) {
         return teacherService.postAQuiz(teacherId, courseCode, quizDetails);
     }
+
+    @RequestMapping(method = RequestMethod.POST, value="/postAnAssignment")
+    public GenericApiResponse postAnAssignment(@RequestParam Integer teacherId, @RequestParam String courseCode, @RequestBody AssignmentDto assignmentDetails) {
+        return teacherService.postAnAssignment(teacherId, courseCode, assignmentDetails);
+    }
+
 }

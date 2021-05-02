@@ -1,14 +1,9 @@
 package com.pec.studentportal.Services.impl;
 
-import com.pec.studentportal.Entity.AttendanceRecord;
-import com.pec.studentportal.Entity.MarksDistribution;
-import com.pec.studentportal.Entity.Student;
-import com.pec.studentportal.Entity.StudentSubjectRegistration;
+import com.pec.studentportal.Entity.*;
 import com.pec.studentportal.Repository.StudentRepository;
 import com.pec.studentportal.Services.StudentService;
-import com.pec.studentportal.dto.AttendanceRecordDTO;
-import com.pec.studentportal.dto.MarksDetailDTO;
-import com.pec.studentportal.dto.SubjectsEnrolledDTO;
+import com.pec.studentportal.dto.*;
 import com.pec.studentportal.enums.EvaluationType;
 import com.pec.studentportal.pojo.AttendanceDetail;
 import com.pec.studentportal.pojo.MarksDetail;
@@ -33,6 +28,7 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Override
     public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectEnrollments(Integer studentId) {
         try{
             Student student = studentRepository.findByStudentId(studentId);
@@ -49,6 +45,7 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
     public GenericApiDataResponse<MarksDetailDTO> fetchMarksForASubject(Integer studentId, String courseCode) {
         try {
             Student student = studentRepository.findByStudentId(studentId);
@@ -83,6 +80,7 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
     public GenericApiDataResponse<AttendanceRecordDTO> fetchAttendanceForASubject(Integer studentId, String courseCode) {
         try {
             Student student = studentRepository.findByStudentId(studentId);
@@ -114,6 +112,7 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
     public GenericApiDataResponse<Map<String, Map<EvaluationType,List<MarksDistribution>>>> fetchMarks(Integer studentId) {
         try {
             Student student = studentRepository.findByStudentId(studentId);
@@ -134,6 +133,7 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
     public GenericApiDataResponse<Map<String, List<AttendanceRecord>>> fetchAttendance(Integer studentId) {
         try{
             Student student = studentRepository.findByStudentId(studentId);
@@ -148,6 +148,63 @@ public class StudentServiceImpl implements StudentService {
         } catch (Exception e) {
             log.error("fetch_attendance_error:studentId:{} with error:{}",studentId,e);
             return new GenericApiDataResponse<>(false,"Some error occurred.",null);
+        }
+    }
+
+    @Override
+    public GenericApiDataResponse<List<QuizDetailsDto>> fetchQuizFeed(Integer studentId) {
+        try {
+            Student student = studentRepository.findByStudentId(studentId);
+            List<QuizDetailsDto> quizDetailsDtoList = new ArrayList<>();
+            List<QuizPostings> quizPostings = student.getQuizPostings();
+            if (CollectionUtils.isEmpty(quizPostings)) {
+                return new GenericApiDataResponse<>(true, "Success", quizDetailsDtoList);
+            }
+            quizPostings.forEach(quizPosting -> {
+                Quiz quiz = quizPosting.getQuiz();
+                QuizDetailsDto quizDetailsDto = QuizDetailsDto.builder()
+                        .quizSubjectCode(quiz.getSubject().getCourseCode())
+                        .quizSubjectName(quiz.getSubject().getCourseName())
+                        .quizTitle(quiz.getQuizTitle())
+                        .quizDate(quiz.getQuizDate())
+                        .quizInstructions(quiz.getQuizInstructions())
+                        .quizTimings(quiz.getQuizTimings())
+                        .syllabus(quiz.getSyllabus())
+                        .build();
+                quizDetailsDtoList.add(quizDetailsDto);
+            });
+            return new GenericApiDataResponse<>(true, "Success", quizDetailsDtoList);
+        } catch (Exception e) {
+            log.error("fetch_quiz_feed:studentId:{} with error:{}",studentId,e);
+            return new GenericApiDataResponse<>(false,"Some error occurred.",new ArrayList<>());
+        }
+    }
+
+    @Override
+    public GenericApiDataResponse<List<AssignmentDetailsDto>> fetchAssignmentFeed(Integer studentId) {
+        try {
+            Student student = studentRepository.findByStudentId(studentId);
+            List<AssignmentDetailsDto> assignmentDetailsDtoList = new ArrayList<>();
+            List<AssignmentPostings> assignmentPostings = student.getAssignmentPostings();
+            if (CollectionUtils.isEmpty(assignmentPostings)) {
+                return new GenericApiDataResponse<>(true, "Success", assignmentDetailsDtoList);
+            }
+            assignmentPostings.forEach(assignmentPosting -> {
+                Assignment assignment = assignmentPosting.getAssignment();
+                AssignmentDetailsDto assignmentDetailsDto = AssignmentDetailsDto.builder()
+                        .assignmentSubjectCode(assignment.getSubject().getCourseCode())
+                        .assignmentSubjectName(assignment.getSubject().getCourseName())
+                        .assignmentTitle(assignment.getAssignmentTitle())
+                        .deadlineDate(assignment.getDeadlineDate())
+                        .deadlineTimings(assignment.getDeadlineTimings())
+                        .description(assignment.getDescription())
+                        .build();
+                assignmentDetailsDtoList.add(assignmentDetailsDto);
+            });
+            return new GenericApiDataResponse<>(true, "Success", assignmentDetailsDtoList);
+        } catch (Exception e) {
+            log.error("fetch_assignment_feed:studentId:{} with error:{}",studentId,e);
+            return new GenericApiDataResponse<>(false,"Some error occurred.",new ArrayList<>());
         }
     }
 }

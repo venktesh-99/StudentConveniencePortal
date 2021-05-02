@@ -58,6 +58,9 @@ public class Student extends AbstractEntity<Integer> {
     @OneToMany(mappedBy = "student")
     private List<QuizPostings> quizPostings;
 
+    @OneToMany(mappedBy = "student")
+    private List<AssignmentPostings> assignmentPostings;
+
     public void setContactNumbers(List<String> contactNumbers) {
         this.contactNumbers = String.join(",", contactNumbers);
     }

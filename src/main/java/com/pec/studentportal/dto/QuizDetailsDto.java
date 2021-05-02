@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuizDTO {
+public class QuizDetailsDto {
+
+    private String quizSubjectCode;
+
+    private String quizSubjectName;
 
     private String quizTitle;
 

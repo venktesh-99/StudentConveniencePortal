@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -18,17 +17,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Quiz extends AbstractEntity<Integer> {
+public class Assignment extends AbstractEntity<Integer> {
 
-    private String quizTitle;
+    private String assignmentTitle;
 
-    private String quizDate;
+    private String deadlineDate;
 
-    private String quizTimings;
+    private String deadlineTimings;
 
-    private String syllabus;
-
-    private String quizInstructions;
+    private String description;
 
     @ManyToOne
     @JsonIgnore
@@ -40,7 +37,7 @@ public class Quiz extends AbstractEntity<Integer> {
     @JoinColumn(name="subject_id")
     private Subject subject;
 
-    @OneToMany(mappedBy = "quiz")
-    private List<QuizPostings> quizPostings;
+    @OneToMany(mappedBy = "assignment")
+    private List<AssignmentPostings> assignmentPostings;
 
 }

@@ -2,9 +2,7 @@ package com.pec.studentportal.Services;
 
 import com.pec.studentportal.Entity.AttendanceRecord;
 import com.pec.studentportal.Entity.MarksDistribution;
-import com.pec.studentportal.dto.AttendanceRecordDTO;
-import com.pec.studentportal.dto.MarksDetailDTO;
-import com.pec.studentportal.dto.SubjectsEnrolledDTO;
+import com.pec.studentportal.dto.*;
 import com.pec.studentportal.enums.EvaluationType;
 import com.pec.studentportal.response.GenericApiDataResponse;
 
@@ -17,12 +15,14 @@ public interface StudentService {
 
     GenericApiDataResponse<MarksDetailDTO> fetchMarksForASubject(Integer studentId, String courseCode);
 
-
-
     GenericApiDataResponse<AttendanceRecordDTO> fetchAttendanceForASubject(Integer studentId, String courseCode);
 
     GenericApiDataResponse<Map<String, Map<EvaluationType, List<MarksDistribution>>>> fetchMarks(Integer studentId);
 
     GenericApiDataResponse<Map<String, List<AttendanceRecord>>> fetchAttendance(Integer studentId);
+
+    GenericApiDataResponse<List<QuizDetailsDto>> fetchQuizFeed(Integer studentId);
+
+    GenericApiDataResponse<List<AssignmentDetailsDto>> fetchAssignmentFeed(Integer studentId);
 
 }

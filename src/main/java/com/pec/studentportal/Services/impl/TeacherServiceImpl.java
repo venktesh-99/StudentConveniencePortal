@@ -1,11 +1,9 @@
 package com.pec.studentportal.Services.impl;
 
 import com.pec.studentportal.Entity.*;
-import com.pec.studentportal.Repository.QuizPostingsRepository;
-import com.pec.studentportal.Repository.QuizRepository;
-import com.pec.studentportal.Repository.SubjectRepository;
-import com.pec.studentportal.Repository.TeacherRepository;
+import com.pec.studentportal.Repository.*;
 import com.pec.studentportal.Services.TeacherService;
+import com.pec.studentportal.dto.AssignmentDto;
 import com.pec.studentportal.dto.QuizDTO;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
 import com.pec.studentportal.response.GenericApiDataResponse;
@@ -35,6 +33,12 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private QuizPostingsRepository quizPostingsRepository;
 
+    @Autowired
+    private AssignmentRepository assignmentRepository;
+
+    @Autowired
+    private AssignmentPostingsRepository assignmentPostingsRepository;
+
     public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(Integer teacherId) {
         try {
             Teacher teacher = teacherRepository.findByTeacherId(teacherId);
@@ -58,6 +62,7 @@ public class TeacherServiceImpl implements TeacherService {
             Teacher teacher = teacherRepository.findByTeacherId(teacherId);
             Subject subject = subjectRepository.findByCourseCode(courseCode);
             Quiz quiz = Quiz.builder()
+                    .quizTitle(quizDetails.getQuizTitle())
                     .quizDate(quizDetails.getQuizDate())
                     .quizTimings(quizDetails.getQuizTimings())
                     .syllabus(quizDetails.getSyllabus())
@@ -75,7 +80,34 @@ public class TeacherServiceImpl implements TeacherService {
             return new GenericApiResponse(true, "Success.");
         } catch (Exception e) {
             log.error("post_quiz_error:teacherId:{}, courseCode:{}, quizDetails:{} with error:{}", teacherId, courseCode, quizDetails, e);
-            return new GenericApiDataResponse<>(false, "Some error occurred.", null);
+            return new GenericApiResponse(false, "Some error occurred.");
+        }
+    }
+
+    @Override
+    public GenericApiResponse postAnAssignment(Integer teacherId, String courseCode, AssignmentDto assignmentDetails) {
+        try {
+            Teacher teacher = teacherRepository.findByTeacherId(teacherId);
+            Subject subject = subjectRepository.findByCourseCode(courseCode);
+            Assignment assignment = Assignment.builder()
+                    .assignmentTitle(assignmentDetails.getAssignmentTitle())
+                    .deadlineDate(assignmentDetails.getDeadlineDate())
+                    .deadlineTimings(assignmentDetails.getDeadlineTimings())
+                    .description(assignmentDetails.getDescription())
+                    .teacher(teacher)
+                    .subject(subject)
+                    .build();
+            assignmentRepository.save(assignment);
+
+            List<Student> studentsEnrolled = getStudentsEnrolledInACourse(subject);
+            studentsEnrolled.forEach(student -> {
+                AssignmentPostings assignmentPosting = AssignmentPostings.builder().assignment(assignment).student(student).build();
+                assignmentPostingsRepository.save(assignmentPosting);
+            });
+            return new GenericApiResponse(true, "Success.");
+        } catch (Exception e) {
+            log.error("post_assignment_error:teacherId:{}, courseCode:{}, assignmentDetails:{} with error:{}", teacherId, courseCode, assignmentDetails, e);
+            return new GenericApiResponse(false, "Some error occurred.");
         }
     }
 

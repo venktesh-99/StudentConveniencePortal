@@ -9,16 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuizDTO {
+public class AssignmentDto {
 
-    private String quizTitle;
+    private String assignmentTitle;
 
-    private String quizDate;
+    private String deadlineDate;
 
-    private String quizTimings;
+    private String deadlineTimings;
 
-    private String syllabus;
-
-    private String quizInstructions;
+    private String description;
 
 }

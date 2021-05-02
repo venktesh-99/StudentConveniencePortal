@@ -3,9 +3,7 @@ package com.pec.studentportal.Controller;
 import com.pec.studentportal.Entity.AttendanceRecord;
 import com.pec.studentportal.Entity.MarksDistribution;
 import com.pec.studentportal.Services.StudentService;
-import com.pec.studentportal.dto.AttendanceRecordDTO;
-import com.pec.studentportal.dto.MarksDetailDTO;
-import com.pec.studentportal.dto.SubjectsEnrolledDTO;
+import com.pec.studentportal.dto.*;
 import com.pec.studentportal.enums.EvaluationType;
 import com.pec.studentportal.response.GenericApiDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,4 +42,16 @@ public class StudentController {
     public GenericApiDataResponse<Map<String, List<AttendanceRecord>>> fetchAttendance(@PathVariable String id) {
         return studentService.fetchAttendance(Integer.parseInt(id));
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/fetchQuizFeed/{id}")
+    public GenericApiDataResponse<List<QuizDetailsDto>> fetchQuizFeed(@PathVariable String id) {
+        return studentService.fetchQuizFeed(Integer.parseInt(id));
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/fetchAssignmentFeed/{id}")
+    public GenericApiDataResponse<List<AssignmentDetailsDto>> fetchAssignmentFeed(@PathVariable String id) {
+        return studentService.fetchAssignmentFeed(Integer.parseInt(id));
+    }
 }
+
+
