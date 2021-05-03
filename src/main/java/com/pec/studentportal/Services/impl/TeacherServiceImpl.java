@@ -6,15 +6,26 @@ import com.pec.studentportal.Services.TeacherService;
 import com.pec.studentportal.dto.AssignmentDto;
 import com.pec.studentportal.dto.QuizDTO;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
+import com.pec.studentportal.enums.AttendanceStatus;
+import com.pec.studentportal.enums.EvaluationType;
 import com.pec.studentportal.response.GenericApiDataResponse;
 import com.pec.studentportal.response.GenericApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -23,6 +34,9 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private SubjectRepository subjectRepository;
@@ -38,6 +52,12 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Autowired
     private AssignmentPostingsRepository assignmentPostingsRepository;
+
+    @Autowired
+    private MarksDistributionRepository marksDistributionRepository;
+
+    @Autowired
+    private AttendanceRecordRepository attendanceRecordRepository;
 
     public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(Integer teacherId) {
         try {
@@ -111,10 +131,82 @@ public class TeacherServiceImpl implements TeacherService {
         }
     }
 
+    @Override
+    public GenericApiResponse uploadMarks(String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file) {
+        try {
+            byte[] bytes = file.getBytes();
+            ByteArrayInputStream inputFileStream = new ByteArrayInputStream(bytes);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputFileStream));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                List<String> strings = Arrays.asList(line.split(","));
+                Integer studentId = Integer.parseInt(strings.get(0));
+                Double marksObtained = Double.parseDouble(strings.get(1));
+                Student student = studentRepository.findByStudentId(studentId);
+                List<StudentSubjectRegistration> studentSubjectRegistrationList = student.getSubjectRegistrations().stream().filter(studentSubjectRegistration1 -> studentSubjectRegistration1.getSubject().getCourseCode().equals(courseCode)).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(studentSubjectRegistrationList)) {
+                    StudentSubjectRegistration studentSubjectRegistration = studentSubjectRegistrationList.get(0);
+                    MarksDistribution marksDistribution = MarksDistribution.builder()
+                            .maximumMarks(maximumMarks)
+                            .marksObtained(marksObtained)
+                            .evaluationType(EvaluationType.valueOf(evaluationType))
+                            .description(description)
+                            .studentSubjectRegistration(studentSubjectRegistration)
+                            .build();
+                    marksDistributionRepository.save(marksDistribution);
+                }
+            }
+            br.close();
+            return new GenericApiResponse(true, "Success.");
+        } catch (Exception e) {
+            log.error("upload_marks_error:courseCode:{}, evaluationType:{} with error:{}", courseCode, evaluationType, e);
+            return new GenericApiResponse(false, "Some error occurred.");
+        }
+    }
+
+    @Override
+    public GenericApiResponse uploadAttendance(String courseCode, String attendanceDate, Integer attendanceCount, MultipartFile file) {
+        try {
+            byte[] bytes = file.getBytes();
+            ByteArrayInputStream inputFileStream = new ByteArrayInputStream(bytes);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputFileStream));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                List<String> strings = Arrays.asList(line.split(","));
+                Integer studentId = Integer.parseInt(strings.get(0));
+                AttendanceStatus attendanceStatus = getAttendanceStatus(strings.get(1));
+                Student student = studentRepository.findByStudentId(studentId);
+                List<StudentSubjectRegistration> studentSubjectRegistrationList = student.getSubjectRegistrations().stream().filter(studentSubjectRegistration1 -> studentSubjectRegistration1.getSubject().getCourseCode().equals(courseCode)).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(studentSubjectRegistrationList)) {
+                    StudentSubjectRegistration studentSubjectRegistration = studentSubjectRegistrationList.get(0);
+                    AttendanceRecord attendanceRecord = AttendanceRecord.builder()
+                            .date(LocalDate.parse(attendanceDate, DateTimeFormatter.ofPattern("dd/MM/uuuu")))
+                            .attendanceCount(attendanceCount)
+                            .attendanceStatus(attendanceStatus)
+                            .studentSubjectRegistration(studentSubjectRegistration)
+                            .build();
+                    attendanceRecordRepository.save(attendanceRecord);
+                }
+            }
+            br.close();
+            return new GenericApiResponse(true, "Success.");
+        } catch (Exception e) {
+            log.error("upload_attendance_error:courseCode:{}, attendanceDate:{} with error:{}", courseCode, attendanceDate, e);
+            return new GenericApiResponse(false, "Some error occurred.");
+        }
+    }
+
     private List<Student> getStudentsEnrolledInACourse(Subject subject) {
         List<StudentSubjectRegistration> studentSubjectRegistrations = subject.getStudentRegistrations();
         List<Student> studentList = new ArrayList<>();
         studentSubjectRegistrations.forEach(studentSubjectRegistration -> studentList.add(studentSubjectRegistration.getStudent()));
         return studentList;
+    }
+
+    private AttendanceStatus getAttendanceStatus(String attendanceStatus) {
+        if(attendanceStatus.equals("P") || attendanceStatus.equals("p") || attendanceStatus.toLowerCase().equals("present")) {
+            return AttendanceStatus.PRESENT;
+        }
+        return AttendanceStatus.ABSENT;
     }
 }
