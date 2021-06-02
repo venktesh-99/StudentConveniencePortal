@@ -205,7 +205,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public GenericApiResponse addEvaluationComponent(Integer teacherId, String courseCode,EvaluationComponentDto evaluationComponentDto) {
+    public GenericApiResponse addEvaluationComponent(Integer teacherId, String courseCode, EvaluationComponentDto evaluationComponentDto) {
         try {
             Optional<EvaluationComponent> evaluationComponentOptional = evaluationComponentRepository.findById(evaluationComponentDto.getEvaluationComponentId());
             if (!evaluationComponentOptional.isPresent()) {
@@ -256,7 +256,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode) {
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode, String evaluationType) {
         try {
             Teacher teacher = teacherRepository.findByTeacherId(teacherId);
             List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
@@ -265,7 +265,7 @@ public class TeacherServiceImpl implements TeacherService {
                     List<EvaluationComponent> evaluationComponentList = teacherSubjectRegistration.getEvaluationComponents();
                     List<EvaluationComponentDto> evaluationComponentDtoList = new ArrayList<>();
                     evaluationComponentList.forEach(evaluationComponent -> {
-                        if(!evaluationComponent.getIsPosted()) {
+                        if(!evaluationComponent.getIsPosted() && evaluationComponent.getEvaluationType().equals(evaluationType)) {
                             evaluationComponentDtoList.add(getEvaluationComponentDto(evaluationComponent));
                         }
                     });

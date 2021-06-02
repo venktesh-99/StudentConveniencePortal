@@ -26,6 +26,6 @@ public interface TeacherService {
 
     GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponents(Integer teacherId, String courseCode);
 
-    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode);
+    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode, String evaluationType);
 
 }

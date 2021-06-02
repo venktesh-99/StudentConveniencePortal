@@ -56,8 +56,8 @@ public class TeacherController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/getEvaluationComponentsForDropDown")
-    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(@RequestParam Integer teacherId, @RequestParam String courseCode) {
-        return teacherService.getEvaluationComponentsForDropDown(teacherId, courseCode);
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(@RequestParam Integer teacherId, @RequestParam String courseCode, @RequestParam String evaluationType) {
+        return teacherService.getEvaluationComponentsForDropDown(teacherId, courseCode, evaluationType);
     }
 
 }
