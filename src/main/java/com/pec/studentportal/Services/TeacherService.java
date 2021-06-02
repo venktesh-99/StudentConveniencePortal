@@ -1,6 +1,7 @@
 package com.pec.studentportal.Services;
 
 import com.pec.studentportal.dto.AssignmentDto;
+import com.pec.studentportal.dto.EvaluationComponentDto;
 import com.pec.studentportal.dto.QuizDTO;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
 import com.pec.studentportal.response.GenericApiDataResponse;
@@ -20,5 +21,11 @@ public interface TeacherService {
     GenericApiResponse uploadMarks(String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file);
 
     GenericApiResponse uploadAttendance(String courseCode, String attendanceDate, Integer attendanceCount, MultipartFile file);
+
+    GenericApiResponse addEvaluationComponent(Integer teacherId, String courseCode, EvaluationComponentDto evaluationComponentDto);
+
+    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponents(Integer teacherId, String courseCode);
+
+    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode);
 
 }

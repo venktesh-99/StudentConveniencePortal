@@ -30,6 +30,8 @@ public class Quiz extends AbstractEntity<Integer> {
 
     private String quizInstructions;
 
+    private Integer evaluationComponentId;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="teacher_id")

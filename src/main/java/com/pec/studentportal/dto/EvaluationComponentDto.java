@@ -9,18 +9,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuizDTO {
+public class EvaluationComponentDto {
 
     private Integer evaluationComponentId;
 
-    private String quizTitle;
+    private String evaluationType;
 
-    private String quizDate;
+    private String evaluationTitle;
 
-    private String quizTimings;
+    private Double weightAge;
 
-    private String syllabus;
-
-    private String quizInstructions;
+    private String evaluationDate;
 
 }

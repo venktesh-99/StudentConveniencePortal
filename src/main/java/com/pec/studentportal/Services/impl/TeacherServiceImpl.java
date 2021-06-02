@@ -4,6 +4,7 @@ import com.pec.studentportal.Entity.*;
 import com.pec.studentportal.Repository.*;
 import com.pec.studentportal.Services.TeacherService;
 import com.pec.studentportal.dto.AssignmentDto;
+import com.pec.studentportal.dto.EvaluationComponentDto;
 import com.pec.studentportal.dto.QuizDTO;
 import com.pec.studentportal.dto.SubjectsEnrolledDTO;
 import com.pec.studentportal.enums.AttendanceStatus;
@@ -22,9 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,6 +58,9 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private AttendanceRecordRepository attendanceRecordRepository;
 
+    @Autowired
+    private EvaluationComponentRepository evaluationComponentRepository;
+
     public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectForATeacher(Integer teacherId) {
         try {
             Teacher teacher = teacherRepository.findByTeacherId(teacherId);
@@ -87,10 +89,13 @@ public class TeacherServiceImpl implements TeacherService {
                     .quizTimings(quizDetails.getQuizTimings())
                     .syllabus(quizDetails.getSyllabus())
                     .quizInstructions(quizDetails.getQuizInstructions())
+                    .evaluationComponentId(quizDetails.getEvaluationComponentId())
                     .teacher(teacher)
                     .subject(subject)
                     .build();
             quizRepository.save(quiz);
+
+            markEvaluationComponentAsPosted(quizDetails.getEvaluationComponentId());
 
             List<Student> studentsEnrolled = getStudentsEnrolledInACourse(subject);
             studentsEnrolled.forEach(student -> {
@@ -114,10 +119,13 @@ public class TeacherServiceImpl implements TeacherService {
                     .deadlineDate(assignmentDetails.getDeadlineDate())
                     .deadlineTimings(assignmentDetails.getDeadlineTimings())
                     .description(assignmentDetails.getDescription())
+                    .evaluationComponentId(assignmentDetails.getEvaluationComponentId())
                     .teacher(teacher)
                     .subject(subject)
                     .build();
             assignmentRepository.save(assignment);
+
+            markEvaluationComponentAsPosted(assignmentDetails.getEvaluationComponentId());
 
             List<Student> studentsEnrolled = getStudentsEnrolledInACourse(subject);
             studentsEnrolled.forEach(student -> {
@@ -196,6 +204,81 @@ public class TeacherServiceImpl implements TeacherService {
         }
     }
 
+    @Override
+    public GenericApiResponse addEvaluationComponent(Integer teacherId, String courseCode,EvaluationComponentDto evaluationComponentDto) {
+        try {
+            Optional<EvaluationComponent> evaluationComponentOptional = evaluationComponentRepository.findById(evaluationComponentDto.getEvaluationComponentId());
+            if (!evaluationComponentOptional.isPresent()) {
+                EvaluationComponent evaluationComponent = new EvaluationComponent();
+                evaluationComponent.setIsPosted(false);
+                Teacher teacher = teacherRepository.findByTeacherId(teacherId);
+                List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
+                for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
+                    if (teacherSubjectRegistration.getSubject().getCourseCode().equals(courseCode)) {
+                        evaluationComponent.setTeacherSubjectRegistration(teacherSubjectRegistration);
+                        break;
+                    }
+                }
+                evaluationComponentOptional = Optional.ofNullable(evaluationComponent);
+            }
+            evaluationComponentOptional.get().setEvaluationType(evaluationComponentDto.getEvaluationType());
+            evaluationComponentOptional.get().setEvaluationTitle(evaluationComponentDto.getEvaluationTitle());
+            evaluationComponentOptional.get().setWeightAge(evaluationComponentDto.getWeightAge());
+            evaluationComponentOptional.get().setEvaluationDate(evaluationComponentDto.getEvaluationDate());
+            evaluationComponentRepository.save(evaluationComponentOptional.get());
+            return new GenericApiResponse(true, "Success.");
+        } catch (Exception e) {
+            log.error("add_evaluation_component:evaluationComponentDto:{} with error:{}", evaluationComponentDto, e);
+            return new GenericApiResponse(false, "Some error occurred.");
+        }
+    }
+
+    @Override
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponents(Integer teacherId, String courseCode) {
+        try {
+            Teacher teacher = teacherRepository.findByTeacherId(teacherId);
+            List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
+            for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
+                if (teacherSubjectRegistration.getSubject().getCourseCode().equals(courseCode)) {
+                    List<EvaluationComponent> evaluationComponentList = teacherSubjectRegistration.getEvaluationComponents();
+                    List<EvaluationComponentDto> evaluationComponentDtoList = new ArrayList<>();
+                    evaluationComponentList.forEach(evaluationComponent -> {
+                        evaluationComponentDtoList.add(getEvaluationComponentDto(evaluationComponent));
+                    });
+                    return new GenericApiDataResponse<>(true, "Success.", evaluationComponentDtoList);
+                }
+            }
+            return new GenericApiDataResponse<>(true, "Success.", new ArrayList<>());
+        } catch (Exception e) {
+            log.error("get_evaluation_components:teacherId:{}, courseCode:{} with error:{}", teacherId, courseCode, e);
+            return new GenericApiDataResponse<>(false, "Some error occurred.", new ArrayList<>());
+        }
+    }
+
+    @Override
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode) {
+        try {
+            Teacher teacher = teacherRepository.findByTeacherId(teacherId);
+            List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
+            for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
+                if (teacherSubjectRegistration.getSubject().getCourseCode().equals(courseCode)) {
+                    List<EvaluationComponent> evaluationComponentList = teacherSubjectRegistration.getEvaluationComponents();
+                    List<EvaluationComponentDto> evaluationComponentDtoList = new ArrayList<>();
+                    evaluationComponentList.forEach(evaluationComponent -> {
+                        if(!evaluationComponent.getIsPosted()) {
+                            evaluationComponentDtoList.add(getEvaluationComponentDto(evaluationComponent));
+                        }
+                    });
+                    return new GenericApiDataResponse<>(true, "Success.", evaluationComponentDtoList);
+                }
+            }
+            return new GenericApiDataResponse<>(true, "Success.", new ArrayList<>());
+        } catch (Exception e) {
+            log.error("get_evaluation_components:teacherId:{}, courseCode:{} with error:{}", teacherId, courseCode, e);
+            return new GenericApiDataResponse<>(false, "Some error occurred.", new ArrayList<>());
+        }
+    }
+
     private List<Student> getStudentsEnrolledInACourse(Subject subject) {
         List<StudentSubjectRegistration> studentSubjectRegistrations = subject.getStudentRegistrations();
         List<Student> studentList = new ArrayList<>();
@@ -209,4 +292,21 @@ public class TeacherServiceImpl implements TeacherService {
         }
         return AttendanceStatus.ABSENT;
     }
+
+    private void markEvaluationComponentAsPosted(Integer evaluationComponentId) {
+        EvaluationComponent evaluationComponent = evaluationComponentRepository.findById(evaluationComponentId).get();
+        evaluationComponent.setIsPosted(true);
+        evaluationComponentRepository.save(evaluationComponent);
+    }
+
+    private EvaluationComponentDto getEvaluationComponentDto(EvaluationComponent evaluationComponent) {
+        return EvaluationComponentDto.builder()
+                .evaluationComponentId(evaluationComponent.getId())
+                .evaluationType(evaluationComponent.getEvaluationType())
+                .evaluationTitle(evaluationComponent.getEvaluationTitle())
+                .weightAge(evaluationComponent.getWeightAge())
+                .evaluationDate(evaluationComponent.getEvaluationDate())
+                .build();
+    }
+
 }

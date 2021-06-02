@@ -27,6 +27,8 @@ public class Assignment extends AbstractEntity<Integer> {
 
     private String description;
 
+    private Integer evaluationComponentId;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="teacher_id")

@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AssignmentDto {
 
+    private Integer evaluationComponentId;
+
     private String assignmentTitle;
 
     private String deadlineDate;
