@@ -52,6 +52,11 @@ public class StudentController {
     public GenericApiDataResponse<List<AssignmentDetailsDto>> fetchAssignmentFeed(@PathVariable String id) {
         return studentService.fetchAssignmentFeed(Integer.parseInt(id));
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/getEvaluationComponentsForASubject")
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForASubject(@RequestParam String courseCode) {
+        return studentService.getEvaluationComponentsForASubject(courseCode);
+    }
 }
 
 

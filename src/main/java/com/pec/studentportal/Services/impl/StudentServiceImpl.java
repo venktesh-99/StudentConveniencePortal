@@ -2,6 +2,7 @@ package com.pec.studentportal.Services.impl;
 
 import com.pec.studentportal.Entity.*;
 import com.pec.studentportal.Repository.StudentRepository;
+import com.pec.studentportal.Repository.SubjectRepository;
 import com.pec.studentportal.Services.StudentService;
 import com.pec.studentportal.dto.*;
 import com.pec.studentportal.enums.EvaluationType;
@@ -27,6 +28,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     @Override
     public GenericApiDataResponse<List<SubjectsEnrolledDTO>> fetchSubjectEnrollments(Integer studentId) {
@@ -207,4 +211,37 @@ public class StudentServiceImpl implements StudentService {
             return new GenericApiDataResponse<>(false,"Some error occurred.",new ArrayList<>());
         }
     }
+
+    @Override
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForASubject(String courseCode) {
+        try {
+            Subject subject = subjectRepository.findByCourseCode(courseCode);
+            List<TeacherSubjectRegistration> teacherSubjectRegistrationList = subject.getTeacherSubjectRegistrations();
+            for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
+                if (teacherSubjectRegistration.getSubject().getCourseCode().equals(courseCode)) {
+                    List<EvaluationComponent> evaluationComponentList = teacherSubjectRegistration.getEvaluationComponents();
+                    List<EvaluationComponentDto> evaluationComponentDtoList = new ArrayList<>();
+                    evaluationComponentList.forEach(evaluationComponent -> {
+                        evaluationComponentDtoList.add(getEvaluationComponentDto(evaluationComponent));
+                    });
+                    return new GenericApiDataResponse<>(true, "Success.", evaluationComponentDtoList);
+                }
+            }
+            return new GenericApiDataResponse<>(true, "Success.", new ArrayList<>());
+        } catch (Exception e) {
+            log.error("get_evaluation_components_for_subject: courseCode:{} with error:{}", courseCode, e);
+            return new GenericApiDataResponse<>(false, "Some error occurred.", new ArrayList<>());
+        }
+    }
+
+    private EvaluationComponentDto getEvaluationComponentDto(EvaluationComponent evaluationComponent) {
+        return EvaluationComponentDto.builder()
+                .evaluationComponentId(evaluationComponent.getId())
+                .evaluationType(evaluationComponent.getEvaluationType())
+                .evaluationTitle(evaluationComponent.getEvaluationTitle())
+                .weightAge(evaluationComponent.getWeightAge())
+                .evaluationDate(evaluationComponent.getEvaluationDate())
+                .build();
+    }
+
 }

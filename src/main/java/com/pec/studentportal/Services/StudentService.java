@@ -25,4 +25,6 @@ public interface StudentService {
 
     GenericApiDataResponse<List<AssignmentDetailsDto>> fetchAssignmentFeed(Integer studentId);
 
+    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForASubject(String courseCode);
+
 }
