@@ -26,6 +26,8 @@ public class MarksDistribution extends AbstractEntity<Integer> {
 
     private String description;
 
+    private Integer evaluationComponentId;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "studentSubjectRegistration_id")

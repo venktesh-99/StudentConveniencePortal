@@ -27,6 +27,8 @@ public class EvaluationComponent extends AbstractEntity<Integer> {
 
     private Boolean isPosted;
 
+    private Boolean isMarksUploaded;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "teacherSubjectRegistration_id")

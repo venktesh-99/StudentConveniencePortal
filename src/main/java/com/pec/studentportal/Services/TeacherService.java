@@ -18,7 +18,7 @@ public interface TeacherService {
 
     GenericApiResponse postAnAssignment(Integer teacherId, String courseCode, AssignmentDto assignmentDetails);
 
-    GenericApiResponse uploadMarks(String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file);
+    GenericApiResponse uploadMarks(Integer evaluationComponentId, String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file);
 
     GenericApiResponse uploadAttendance(String courseCode, String attendanceDate, Integer attendanceCount, MultipartFile file);
 
@@ -27,5 +27,7 @@ public interface TeacherService {
     GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponents(Integer teacherId, String courseCode);
 
     GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(Integer teacherId, String courseCode, String evaluationType);
+
+    GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForMarksUploadDropDown(Integer teacherId, String courseCode);
 
 }

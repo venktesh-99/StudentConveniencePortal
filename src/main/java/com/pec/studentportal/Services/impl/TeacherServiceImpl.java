@@ -140,7 +140,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public GenericApiResponse uploadMarks(String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file) {
+    public GenericApiResponse uploadMarks(Integer evaluationComponentId, String courseCode, String description, String evaluationType, Double maximumMarks, MultipartFile file) {
         try {
             byte[] bytes = file.getBytes();
             ByteArrayInputStream inputFileStream = new ByteArrayInputStream(bytes);
@@ -159,12 +159,14 @@ public class TeacherServiceImpl implements TeacherService {
                             .marksObtained(marksObtained)
                             .evaluationType(EvaluationType.valueOf(evaluationType))
                             .description(description)
+                            .evaluationComponentId(evaluationComponentId)
                             .studentSubjectRegistration(studentSubjectRegistration)
                             .build();
                     marksDistributionRepository.save(marksDistribution);
                 }
             }
             br.close();
+            markEvaluationComponentAsPostedForMarks(evaluationComponentId);
             return new GenericApiResponse(true, "Success.");
         } catch (Exception e) {
             log.error("upload_marks_error:courseCode:{}, evaluationType:{} with error:{}", courseCode, evaluationType, e);
@@ -211,6 +213,7 @@ public class TeacherServiceImpl implements TeacherService {
             if (!evaluationComponentOptional.isPresent()) {
                 EvaluationComponent evaluationComponent = new EvaluationComponent();
                 evaluationComponent.setIsPosted(false);
+                evaluationComponent.setIsMarksUploaded(false);
                 Teacher teacher = teacherRepository.findByTeacherId(teacherId);
                 List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
                 for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
@@ -279,6 +282,30 @@ public class TeacherServiceImpl implements TeacherService {
         }
     }
 
+    @Override
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForMarksUploadDropDown(Integer teacherId, String courseCode) {
+        try {
+            Teacher teacher = teacherRepository.findByTeacherId(teacherId);
+            List<TeacherSubjectRegistration> teacherSubjectRegistrationList = teacher.getSubjectRegistrations();
+            for (TeacherSubjectRegistration teacherSubjectRegistration : teacherSubjectRegistrationList) {
+                if (teacherSubjectRegistration.getSubject().getCourseCode().equals(courseCode)) {
+                    List<EvaluationComponent> evaluationComponentList = teacherSubjectRegistration.getEvaluationComponents();
+                    List<EvaluationComponentDto> evaluationComponentDtoList = new ArrayList<>();
+                    evaluationComponentList.forEach(evaluationComponent -> {
+                        if(!evaluationComponent.getIsMarksUploaded()) {
+                            evaluationComponentDtoList.add(getEvaluationComponentDto(evaluationComponent));
+                        }
+                    });
+                    return new GenericApiDataResponse<>(true, "Success.", evaluationComponentDtoList);
+                }
+            }
+            return new GenericApiDataResponse<>(true, "Success.", new ArrayList<>());
+        } catch (Exception e) {
+            log.error("get_evaluation_components:teacherId:{}, courseCode:{} with error:{}", teacherId, courseCode, e);
+            return new GenericApiDataResponse<>(false, "Some error occurred.", new ArrayList<>());
+        }
+    }
+
     private List<Student> getStudentsEnrolledInACourse(Subject subject) {
         List<StudentSubjectRegistration> studentSubjectRegistrations = subject.getStudentRegistrations();
         List<Student> studentList = new ArrayList<>();
@@ -296,6 +323,12 @@ public class TeacherServiceImpl implements TeacherService {
     private void markEvaluationComponentAsPosted(Integer evaluationComponentId) {
         EvaluationComponent evaluationComponent = evaluationComponentRepository.findById(evaluationComponentId).get();
         evaluationComponent.setIsPosted(true);
+        evaluationComponentRepository.save(evaluationComponent);
+    }
+
+    private void markEvaluationComponentAsPostedForMarks(Integer evaluationComponentId) {
+        EvaluationComponent evaluationComponent = evaluationComponentRepository.findById(evaluationComponentId).get();
+        evaluationComponent.setIsMarksUploaded(true);
         evaluationComponentRepository.save(evaluationComponent);
     }
 

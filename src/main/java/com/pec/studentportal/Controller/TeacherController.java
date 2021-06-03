@@ -36,8 +36,8 @@ public class TeacherController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/uploadMarks")
-    public GenericApiResponse uploadMarks(@RequestParam String courseCode, @RequestParam String description, @RequestParam String evaluationType, @RequestParam Double maximumMarks, @RequestParam MultipartFile file) {
-        return teacherService.uploadMarks(courseCode, description, evaluationType, maximumMarks, file);
+    public GenericApiResponse uploadMarks(@RequestParam Integer evaluationComponentId, @RequestParam String courseCode, @RequestParam String description, @RequestParam String evaluationType, @RequestParam Double maximumMarks, @RequestParam MultipartFile file) {
+        return teacherService.uploadMarks(evaluationComponentId, courseCode, description, evaluationType, maximumMarks, file);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/uploadAttendance")
@@ -58,6 +58,11 @@ public class TeacherController {
     @RequestMapping(method = RequestMethod.GET, value = "/getEvaluationComponentsForDropDown")
     public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForDropDown(@RequestParam Integer teacherId, @RequestParam String courseCode, @RequestParam String evaluationType) {
         return teacherService.getEvaluationComponentsForDropDown(teacherId, courseCode, evaluationType);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/getEvaluationComponentsForDropDown")
+    public GenericApiDataResponse<List<EvaluationComponentDto>> getEvaluationComponentsForMarksUploadDropDown(@RequestParam Integer teacherId, @RequestParam String courseCode) {
+        return teacherService.getEvaluationComponentsForMarksUploadDropDown(teacherId, courseCode);
     }
 
 }
