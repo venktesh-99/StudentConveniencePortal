@@ -5,6 +5,7 @@ import com.pec.studentportal.Repository.StudentRepository;
 import com.pec.studentportal.Repository.SubjectRepository;
 import com.pec.studentportal.Services.StudentService;
 import com.pec.studentportal.dto.*;
+import com.pec.studentportal.enums.AttendanceStatus;
 import com.pec.studentportal.enums.EvaluationType;
 import com.pec.studentportal.pojo.AttendanceDetail;
 import com.pec.studentportal.pojo.MarksDetail;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,17 +98,23 @@ public class StudentServiceImpl implements StudentService {
             StudentSubjectRegistration studentSubjectRegistration = studentSubjectRegistrationsForCourse.get(0);
             List<AttendanceRecord> attendanceRecords = studentSubjectRegistration.getAttendanceRecords();
             List<AttendanceDetail> attendanceDetails = new ArrayList<>();
+            AtomicReference<Integer> countOFTotalLectures = new AtomicReference<>(0);
+            AtomicReference<Integer> totalLecturesAttended = new AtomicReference<>(0);
             attendanceRecords.forEach(attendanceRecord -> {
                 AttendanceDetail attendanceDetail = AttendanceDetail.builder()
                         .date(attendanceRecord.getDate())
                         .attendanceCount(attendanceRecord.getAttendanceCount())
                         .attendanceStatus(attendanceRecord.getAttendanceStatus().toString())
                         .build();
+                if(AttendanceStatus.PRESENT.equals(attendanceRecord.getAttendanceStatus())) {
+                    totalLecturesAttended.getAndSet(totalLecturesAttended.get() + attendanceRecord.getAttendanceCount());
+                }
+                countOFTotalLectures.getAndSet(countOFTotalLectures.get() + attendanceRecord.getAttendanceCount());
                 attendanceDetails.add(attendanceDetail);
             });
             AttendanceRecordDTO attendanceRecordDTO = AttendanceRecordDTO.builder()
-                    .totalLectures(studentSubjectRegistration.getTotalLectures())
-                    .totalLecturesAttended(studentSubjectRegistration.getTotalLecturesAttended())
+                    .totalLectures(countOFTotalLectures.get())
+                    .totalLecturesAttended(totalLecturesAttended.get())
                     .attendanceDetails(attendanceDetails)
                     .build();
             return new GenericApiDataResponse<>(true,"Success",attendanceRecordDTO);

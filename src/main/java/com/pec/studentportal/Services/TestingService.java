@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -183,8 +184,8 @@ public class TestingService {
         Book book = bookRepository.findByBookId(bookIssueRecordPojo.getBookId());
         BookIssueRecord bookIssueRecord = BookIssueRecord.builder()
                 .book(book)
-                .issueDate(LocalDate.of(2020,10,1))
-                .dueDate(LocalDate.of(2020,12,3))
+                .issueDate(LocalDate.parse(bookIssueRecordPojo.getIssueDate(), DateTimeFormatter.ofPattern("dd/MM/uuuu")))
+                .dueDate(LocalDate.parse(bookIssueRecordPojo.getDueDate(), DateTimeFormatter.ofPattern("dd/MM/uuuu")))
                 .studentId(bookIssueRecordPojo.getStudentId())
                 .bookReturnStatus(BookReturnStatus.valueOf(bookIssueRecordPojo.getBookReturnStatus()))
                 .build();

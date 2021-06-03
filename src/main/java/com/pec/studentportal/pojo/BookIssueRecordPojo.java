@@ -17,9 +17,9 @@ public class BookIssueRecordPojo {
 
     private String bookId;
 
-    private LocalDate issueDate;
+    private String issueDate;
 
-    private LocalDate dueDate;
+    private String dueDate;
 
     private String bookReturnStatus;
 
